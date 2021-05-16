@@ -8,6 +8,10 @@ Change version in logstash-input-mongodb.gemspec
 And build new gem:
 
 ```bash
+# Docker style
+$ docker-compose up
+
+# Or using native gem
 $ gem build logstash-input-mongodb.gemspec
 ```
 

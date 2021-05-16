@@ -1,0 +1,10 @@
+version: '2.2'
+services:
+  builder:
+    container_name: logstash-input-mongodb-builder
+    image: jruby:9.2.17.0
+    entrypoint: bash
+    command: build.sh
+    volumes:
+      - .:/workspace
+    working_dir: /workspace

@@ -291,7 +291,8 @@ class LogStash::Inputs::MongoDB < LogStash::Inputs::Base
                   event.set(k.to_s,v)
                 elsif v.is_a? Time
                   event.set(k.to_s,v.iso8601)
-
+                elsif v.is_a? BSON::ObjectId
+                  event.set(k.to_s,v.to_s)
                 elsif v.is_a? String
                   if v == "NaN"
                     event.set(k.to_s, Float::NAN)
