@@ -35,7 +35,7 @@ class LogStash::Inputs::MongoDB < LogStash::Inputs::Base
   # This allows you to select the column you would like compare the since info
   config :since_column, :validate => :string, :default => "_id"
 
-  # This allows you to select the type of since info, like "id", "date"
+  # This allows you to select the type of since info, like "id", "time"
   config :since_type,   :validate => :string, :default => "id"
 
   # The collection to use. Is turned into a regex so 'events' will match 'events_20150227'
@@ -58,6 +58,8 @@ class LogStash::Inputs::MongoDB < LogStash::Inputs::Base
 
   # Number of seconds to wait after failure before retrying
   config :retry_delay, :validate => :number, :default => 3, :required => false
+
+  config :max_sleep_time, :validate => :number, :default => 1, :required => false
 
   # If true, an "_id" field will be added to the document before insertion.
   # The "_id" field will use the timestamp of the event and overwrite an existing
@@ -148,7 +150,7 @@ class LogStash::Inputs::MongoDB < LogStash::Inputs::Base
     collection = mongodb.collection(mongo_collection_name)
     # Need to make this sort by date in object id then get the first of the series
     # db.events_20150320.find().limit(1).sort({ts:1})
-    return collection.find({:_id => {:$gt => last_id_object}}).limit(batch_size)
+    return collection.find({since_column => {:$gt => last_id_object}}).limit(batch_size)
   end
 
   public
@@ -224,7 +226,7 @@ class LogStash::Inputs::MongoDB < LogStash::Inputs::Base
 
   def run(queue)
     sleep_min = 0.01
-    sleep_max = 5
+    sleep_max = max_sleep_time
     sleeptime = sleep_min
 
     @logger.debug("Tailing MongoDB")
@@ -245,7 +247,7 @@ class LogStash::Inputs::MongoDB < LogStash::Inputs::Base
             last_id_object = BSON::ObjectId(last_id)
           elsif since_type == 'time'
             if last_id != ''
-              last_id_object = Time.at(last_id)
+              last_id_object = Time.at(0, last_id, :millisecond)
             end
           end
           cursor = get_cursor_for_collection(@mongodb, collection_name, last_id_object, batch_size)
@@ -366,7 +368,7 @@ class LogStash::Inputs::MongoDB < LogStash::Inputs::Base
             if since_type == 'id'
               since_id = doc[since_column].to_s
             elsif since_type == 'time'
-              since_id = doc[since_column].to_i
+              since_id = (doc[since_column].to_f*1000).to_i
             end
 
             @collection_data[index][:last_id] = since_id

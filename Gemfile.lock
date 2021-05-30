@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    logstash-input-mongodb (0.4.2)
+    logstash-input-mongodb (0.4.4)
       jdbc-sqlite3 (= 3.8.10.1)
       logstash-codec-plain (~> 3.0)
       logstash-core (>= 5.0)

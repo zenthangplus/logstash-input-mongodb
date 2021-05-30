@@ -33,6 +33,8 @@ placeholder_db_dir   [String]      Path where the place holder database will be 
   This gets created by the plugin so the directory needs to be writeable by the user that logstash is running as
 placeholder_db_name  [String]      Name of the database file that will be created [Default: logstash_sqlite.db]
 collection           [String]      A regex that will be used to find desired collecitons. [No Default, Required]
+since_column         [String]      This allows you to select the column you would like compare the since info [Default: _id]. Ex: _id or updated_at.
+since_type           [String]      This allows you to select the type of since info, like "id", "time" [Default: id]
 generateId           [Boolean]     If true, this will add a field '_id' that contains the MongoDB Document id
 batch_size           [Int]         Size of the batch of mongo documents to pull at a time [Default: 30]
 parse_method         [String]      Built in parsing of the mongodb document object [Default: 'flatten'] Could take value: flatten, dig, simple, json
